@@ -12,10 +12,10 @@ import (
 )
 
 const (
-	ArticleConfPath = "./conf/yaml/article.yaml"
-	OnlineConfPath  = "./conf/yaml/online.yaml"
-	SocialConfPath  = "./conf/yaml/social.yaml"
-	RemindConfPath  = "./conf/yaml/remind.yaml"
+	ArticleConfPath = "/home/work/zzlove/conf/zzlove/api.yaml"
+	OnlineConfPath  = "/home/work/zzlove/conf/zzlove/api.yaml"
+	RemindConfPath  = "/home/work/zzlove/conf/zzlove/api.yaml"
+	SocialConfPath  = "/home/work/zzlove/conf/zzlove/api.yaml"
 
 	MysqlAddr = "%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True"
 )
@@ -33,8 +33,12 @@ type RedisConf struct {
 	DB   int    `yaml:"db"`
 }
 
+type RedisClusterConf struct {
+	Addr []string `yaml:"addr"`
+}
+
 type MCConf struct {
-	Addr string `yaml:"addr"`
+	Addr []string `yaml:"addr"`
 }
 
 type GrpcConf struct {
@@ -43,20 +47,21 @@ type GrpcConf struct {
 }
 
 type EtcdConf struct {
-	Addr string `yaml:"addr"`
+	Addr []string `yaml:"addr"`
 }
 
 type KafkaConf struct {
-	Addr string `yaml:"addr"`
+	Addr []string `yaml:"addr"`
 }
 
 type Conf struct {
-	Mysql MysqlConf `yaml:"mysql"`
-	Redis RedisConf `yaml:"redis"`
-	MC    MCConf    `yaml:"MC"`
-	Grpc  GrpcConf  `yaml:"grpc"`
-	Etcd  EtcdConf  `yaml:"etcd"`
-	Kafka KafkaConf `yaml:"kafka"`
+	Mysql        MysqlConf        `yaml:"mysql"`
+	Slave        MysqlConf        `yaml:"slave"`
+	RedisCluster RedisClusterConf `yaml:"cluster"`
+	MC           MCConf           `yaml:"mc"`
+	Grpc         GrpcConf         `yaml:"grpc"`
+	Etcd         EtcdConf         `yaml:"etcd"`
+	Kafka        KafkaConf        `yaml:"kafka"`
 }
 
 func LoadYaml(path string) (*Conf, error) {
@@ -69,16 +74,14 @@ func LoadYaml(path string) (*Conf, error) {
 	return conf, err
 }
 
-func GetMC(addr string) *memcache.Client {
-	return memcache.New(addr)
+func GetMC(addr []string) *memcache.Client {
+	return memcache.New(addr...)
 }
 
-func GetRedis(addr string, db int) *redis.Client {
-	return redis.NewClient(
-		&redis.Options{
-			Addr: addr,
-			DB:   db,
-		})
+func GetRedisCluster(addr []string) redis.Cmdable {
+	return redis.NewClusterClient(&redis.ClusterOptions{
+		Addrs: addr,
+	})
 }
 
 func GetMysql(addr string) (sqlbuilder.Database, error) {

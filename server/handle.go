@@ -5,7 +5,6 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
-	"log"
 	"onlineservice/conf"
 	"onlineservice/rpc/online/pb"
 )
@@ -21,7 +20,6 @@ var (
 
 func InitService(config *conf.Conf) error {
 	var err error
-	log.SetFlags(log.Ldate | log.Lshortfile | log.Ltime)
 	mcCli = conf.GetMC(config.MC.Addr)
 	redisCli = conf.GetRedisCluster(config.RedisCluster.Addr)
 	//dbCli, err = conf.GetGorm(fmt.Sprintf(conf.MysqlAddr, config.Mysql.User, config.Mysql.Password, config.Mysql.Host, config.Mysql.Port, config.Mysql.DB))

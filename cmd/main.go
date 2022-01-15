@@ -5,6 +5,7 @@ import (
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/registry/etcd"
 	"onlineservice/conf"
+	"onlineservice/global"
 	"onlineservice/rpc/online/pb"
 	"onlineservice/server"
 )
@@ -16,6 +17,15 @@ var (
 
 func main() {
 	onlineConf, err = conf.LoadYaml(conf.OnlineConfPath)
+	if err != nil {
+		panic(err)
+	}
+
+	global.InfoLog, err = conf.InitLog(onlineConf.InfoLog.Path)
+	if err != nil {
+		panic(err)
+	}
+	global.ExcLog, err = conf.InitLog(onlineConf.ExcLog.Path)
 	if err != nil {
 		panic(err)
 	}

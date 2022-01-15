@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redis/redis"
-	"log"
+	"onlineservice/global"
 	"onlineservice/util/cast"
 	"onlineservice/util/constant"
 )
@@ -18,7 +18,7 @@ func cacheStartUp(ctx context.Context, uid int64) error {
 	key := fmt.Sprintf(RedisKeySOnlineUser, idx)
 	err := redisCli.SAdd(key, uid).Err()
 	if err != nil {
-		log.Printf("ctx %v cacheStartUp uid %v err %v", ctx, uid, err)
+		global.ExcLog.Printf("ctx %v cacheStartUp uid %v err %v", ctx, uid, err)
 	}
 	return err
 }
@@ -28,7 +28,7 @@ func cacheShutdown(ctx context.Context, uid int64) error {
 	key := fmt.Sprintf(RedisKeySOnlineUser, idx)
 	err := redisCli.SRem(key, uid).Err()
 	if err != nil {
-		log.Printf("ctx %v cacheShutdown uid %v err %v", ctx, uid, err)
+		global.ExcLog.Printf("ctx %v cacheShutdown uid %v err %v", ctx, uid, err)
 	}
 	return err
 }
@@ -41,7 +41,7 @@ func cacheGetOnlineAll(ctx context.Context) ([]int64, int64, error) {
 		val, err := redisCli.SMembers(key).Result()
 		cnt += int64(len(val))
 		if err != nil && err != redis.Nil {
-			log.Printf("ctx %v cacheGetOnlineAll key %v err %v", ctx, key, err)
+			global.ExcLog.Printf("ctx %v cacheGetOnlineAll key %v err %v", ctx, key, err)
 			return nil, 0, err
 		}
 		for _, v := range val {

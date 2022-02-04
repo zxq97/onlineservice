@@ -10,6 +10,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/micro/go-micro v1.18.0
+	go.mongodb.org/mongo-driver v1.8.3
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	upper.io/db.v3 v3.8.0+incompatible

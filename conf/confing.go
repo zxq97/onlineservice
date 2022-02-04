@@ -1,9 +1,13 @@
 package conf
 
 import (
+	"context"
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/go-redis/redis/v8"
 	"github.com/jinzhu/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -61,6 +65,11 @@ type KafkaConf struct {
 	Addr []string `yaml:"addr"`
 }
 
+type MongoConf struct {
+	DBName string `yaml:"db_name"`
+	Addr   string `yaml:"addr"`
+}
+
 type LogConf struct {
 	Info  string `yaml:"info"`
 	Exc   string `yaml:"exc"`
@@ -75,6 +84,7 @@ type Conf struct {
 	Grpc         GrpcConf         `yaml:"grpc"`
 	Etcd         EtcdConf         `yaml:"etcd"`
 	Kafka        KafkaConf        `yaml:"kafka"`
+	Mongo        MongoConf        `yaml:"mongo"`
 	LogPath      LogConf          `yaml:"log_path"`
 }
 
@@ -119,6 +129,12 @@ func GetGorm(addr string) (*gorm.DB, error) {
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(50)
 	return db, nil
+}
+
+func GetMongo(addr string) (*mongo.Client, error) {
+	opts := options.Client().ApplyURI(addr)
+	opts = opts.SetReadPreference(readpref.SecondaryPreferred())
+	return mongo.Connect(context.Background(), opts)
 }
 
 func InitLog(path string) (*log.Logger, error) {
